@@ -1,3 +1,6 @@
+#!/usr/bin/env python
+
+
 """
 This pseudo calculator should support the following operations:
 
@@ -27,23 +30,36 @@ def resolve_path(path):
     arguments, based on the path.
     """
 
+    path = path.strip('/').split('/')
+
+    func_name = path[0]
+    args = int(path[1])
+    #args = -11
+    #return path
+    #return func_name, args
+    return func_name,args
     # TODO: Provide correct values for func and args. The
     # examples provide the correct *syntax*, but you should
     # determine the actual values of func and args using the
     # path.
-    func = some_func
-    args = ['25', '32']
 
-    return func, args
 
 def application(environ, start_response):
+
     headers = [('Content-type', 'text/html')]
+    
     try:
         path = environ.get('PATH_INFO', None)
         if path is None:
             raise NameError
         func, args = resolve_path(path)
-        body = func(*args)
+        if func == 'positive':
+            args = -int(args)
+        if int(args) < 0:
+            result = 'true'
+        else:
+            result = 'false'
+        body = result
         status = "200 OK"
     except NameError:
         status = "404 Not Found"
@@ -55,6 +71,8 @@ def application(environ, start_response):
         headers.append(('Content-length', str(len(body))))
         start_response(status, headers)
         return [body.encode('utf8')]
+
+        #return [body.encode('utf8')]
 
 if __name__ == '__main__':
     from wsgiref.simple_server import make_server
